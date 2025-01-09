@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Timer</title>
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #add8e6;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    
+    .timer-container {
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .timer-value {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .timer-value:active {
+      transform: scale(1.1);
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      background: linear-gradient(145deg, #4CAF50, #2c6c32);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: linear-gradient(145deg, #2c6c32, #4CAF50);
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      background: linear-gradient(145deg, #388e3c, #4CAF50);
+      transform: scale(0.98);
+    }
+
+    .reset-button {
+      background: linear-gradient(145deg, #ff4081, #d500f9);
+    }
+
+    .reset-button:hover {
+      background: linear-gradient(145deg, #d500f9, #ff4081);
+    }
+
+    .pause-button {
+      background: linear-gradient(145deg, #ff9800, #f57c00);
+    }
+
+    .pause-button:hover {
+      background: linear-gradient(145deg, #f57c00, #ff9800);
+    }
+
+    .notification {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+      font-weight: bold;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="timer-container">
+    <div class="timer-value" id="timerValue">00:00</div>
+    <div class="buttons">
+      <button id="startButton">Start</button>
+      <button id="pauseButton" class="pause-button">Pause</button>
+      <button id="resetButton" class="reset-button">Reset</button>
+    </div>
+    <div id="notification" class="notification"></div>
+  </div>
+
+  <script>
+    let timerInterval;
+    let seconds = 0;
+    let minutes = 0;
+    let isRunning = false;
+
+    function updateTimerDisplay() {
+      const timeString = formatTime(minutes, seconds);
+      document.getElementById('timerValue').textContent = timeString;
+      localStorage.setItem('timerTime', JSON.stringify({ minutes, seconds }));
+    }
+    function formatTime(minutes, seconds) {
+      return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function startTimer() {
+      if (!isRunning) {
+        timerInterval = setInterval(() => {
+          seconds++;
+          if (seconds >= 60) {
+            seconds = 0;
+            minutes++;
+          }
+          updateTimerDisplay();
+        }, 1000);
+        isRunning = true;
+        displayNotification('Timer started');
+      }
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      displayNotification('Timer paused');
+    }
+
+    
+    function resetTimer() {
+      clearInterval(timerInterval);
+      seconds = 0;
+      minutes = 0;
+      isRunning = false;
+      updateTimerDisplay();
+      displayNotification('Timer reset');
+    }
+    window.onload = function() {
+      const savedTime = JSON.parse(localStorage.getItem('timerTime'));
+      if (savedTime) {
+        minutes = savedTime.minutes;
+        seconds = savedTime.seconds;
+        updateTimerDisplay();
+      }
+    }
+
+    function displayNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      setTimeout(() => {
+        notification.textContent = '';  
+      }, 2000);
+    }
+
+    
+    document.getElementById('startButton').addEventListener('click', startTimer);
+    document.getElementById('pauseButton').addEventListener('click', pauseTimer);
+    document.getElementById('resetButton').addEventListener('click', resetTimer);
+  </script>
+</body>
+</html>
